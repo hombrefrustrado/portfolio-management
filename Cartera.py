@@ -35,7 +35,9 @@ class Cartera():
             case 1:
                 codigo = input("Introduce su código: ")
                 monto = float(input("Introduce una aportacion anual: "))
-                self.fondos.append(Fondo(codigo,monto))
+                rentabilidad = float(input("Introduce la rentabilidad esperada: "))
+                riesgo = float(input("Introduce el riesgo: "))
+                self.fondos.append(Fondo(codigo,monto,rentabilidad,riesgo))
             case 2:
                 codigo = input("Introduce su código: ")
                 fondo = next((f for f in self.fondos if f.codigo == codigo), None)
@@ -45,12 +47,18 @@ class Cartera():
                     print("No se encontró ningún fondo con ese código.")
             case 3:
                 codigo = input("Introduce su código: ")
-                monto = float(input("Introduce una aportacion anual: "))
-                interes = float(input("Introduce el interes previsto: "))
                 fondo = next((f for f in self.fondos if f.codigo == codigo), None)
                 
-                if fondo:
-                    fondo.monto = monto
-                    print(f"Se actualizó el monto del fondo {codigo} a {monto}")
-                else:
+                if not fondo:
                     print("No se encontró ningún fondo con ese código.")
+                    return
+
+                monto = float(input("Introduce una aportacion anual: "))
+                interes = float(input("Introduce el interes previsto: "))
+                riesgo = float(input("Introduce el riesgo: "))
+                
+                fondo.monto = monto
+                fondo.riesgo = riesgo
+                fondo.rentabilidad = interes
+                print(f"Se actualizó el monto del fondo {codigo} a {monto}")
+            

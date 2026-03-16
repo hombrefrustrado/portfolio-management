@@ -6,21 +6,17 @@ La información que contiene esta clase será:
     4- el riesgo del mismo
 """
 class Fondo():
-    def __init__(self, codigo, monto):
+    def __init__(self, codigo, monto, rentabilidad=10, riesgo=4):
         """
         arg:
             fondo: el identificador alfa númerico del mismo.
         """
         self.codigo = codigo
+        self.rentabilidad = rentabilidad
+        self.riesgo = riesgo
         self.monto = monto
-
         self.nombre = self.codigo
-        self.datos()
     
-    def datos(self):
-        self.rentabilidad = 10 # prueba de mockup, esto no es una rentabilidad real y se debería resolver con una consulta html
-        self.riesgo = 4
-
     def resume(self):
         print(f"{self.nombre} - {self.codigo} : {self.monto} : {self.rentabilidad} % - {self.riesgo}")
 

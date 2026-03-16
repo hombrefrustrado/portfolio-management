@@ -23,13 +23,17 @@ def graficar_continuo_por_fondo(cartera, tiempo=40, pasos=1000):
     
     # Colores automáticos
     colores = plt.cm.tab10.colors  # 10 colores distintos
+    aporte_total = sum(fondo.monto for fondo in cartera.fondos)
+    ahorro_total = aporte_total * t
+
     for i, fondo in enumerate(cartera.fondos):
-        patrimonio_fondo = fondo.monto * (1 + fondo.rentabilidad / 100) ** t / (fondo.rentabilidad / 100)
+        patrimonio_fondo = fondo.monto * ((1 + fondo.rentabilidad / 100) ** t - 1) / (fondo.rentabilidad / 100)
         total += patrimonio_fondo
         ax.plot(t, patrimonio_fondo, color=colores[i % len(colores)], linewidth=1.5, label=fondo.nombre)
     
     # Curva total
     ax.plot(t, total, color='black', linewidth=2, linestyle='--', label='Total')
+    ax.plot(t, ahorro_total, color='gray', linewidth=1, linestyle=':', label='Ahorro Total')
     
     # Configuración gráfica
     ax.set_title("Evolución prevista del patrimonio por fondo")
@@ -82,4 +86,5 @@ Selecciona una opcion
             case 2:
                 cartera.modificar()
             case 3:
-                graficar_continuo_por_fondo(cartera)
+                anyos = int(input("Introduce el número de años para la proyección: "))
+                graficar_continuo_por_fondo(cartera, tiempo=anyos)
