@@ -1,7 +1,8 @@
 from Fondo import Fondo
+import json
 class Cartera():
-    def __init__(self):  
-        self.fondos = []
+    def __init__(self,fondos=None):  
+        self.fondos = fondos if fondos is not None else []
     
     def anyadir_fondo(self,codigo, monto=0):
         self.fondos.append(Fondo(codigo,monto))
@@ -61,4 +62,10 @@ class Cartera():
                 fondo.riesgo = riesgo
                 fondo.rentabilidad = interes
                 print(f"Se actualizó el monto del fondo {codigo} a {monto}")
-            
+    def to_dict(self):
+        return [fondo.to_dict() for fondo in self.fondos]
+    
+    @classmethod
+    def from_dict(cls, data):
+        fondos = [Fondo.from_dict(f) for f in data]
+        return cls(fondos)

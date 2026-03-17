@@ -1,3 +1,4 @@
+import json
 """
 La información que contiene esta clase será:
     1- el identificador númerico
@@ -22,3 +23,20 @@ class Fondo():
 
     def __str__(self):
         return f"{self.nombre} - {self.codigo} : {self.monto} : {self.rentabilidad} % - {self.riesgo}"
+    def to_dict(self):
+        return {
+            "codigo":self.codigo,
+            "nombre":self.nombre,
+            "monto":self.monto,
+            "rentabilidad":self.rentabilidad,
+            "riesgo":self.riesgo
+        }
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            codigo=data["codigo"],
+            monto=data["monto"],
+            rentabilidad=data["rentabilidad"],
+            riesgo=data["riesgo"]
+        )
+    

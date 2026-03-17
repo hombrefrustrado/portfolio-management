@@ -1,6 +1,9 @@
 #externo
 import numpy as np
 import matplotlib.pyplot as plt
+import json
+import os
+from pathlib import Path
 
 #propio
 from Fondo import Fondo
@@ -43,6 +46,27 @@ def graficar_continuo_por_fondo(cartera, tiempo=40, pasos=1000):
     ax.legend(loc='upper left')  # Muestra la leyenda
     
     plt.show()
+def guardar_cartera(cartera,folder=None, file_name="configuracion.json"):
+
+    if folder:
+        os.makedirs(folder,exist_ok=True)
+        path = os.path.join(folder,file_name)
+    else:
+        path = file_name
+    with open(path,mode='w') as f:
+        json.dump(cartera.to_dict(),f)
+def cargar_cartera(folder=None, file_name="configuracion.json"):
+    
+    if folder:
+        path = Path(folder) / file_name
+    else:
+        path = Path(file_name)
+
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    return Cartera.from_dict(data)
+
 if __name__ == "__main__":
     cartera = Cartera()
 
@@ -88,3 +112,9 @@ Selecciona una opcion
             case 3:
                 anyos = int(input("Introduce el número de años para la proyección: "))
                 graficar_continuo_por_fondo(cartera, tiempo=anyos)
+            case 4:
+                guardar_cartera(cartera)
+            case 5:
+                cartera = cargar_cartera()
+            case _:
+                print("opcion no valida")
