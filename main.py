@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import json
 import os
 from pathlib import Path
-
+import questionary
 #propio
 from Fondo import Fondo
 from Cartera import Cartera
@@ -66,6 +66,50 @@ def cargar_cartera(folder=None, file_name="configuracion.json"):
         data = json.load(f)
 
     return Cartera.from_dict(data)
+import questionary
+
+def ejecutar_menu(cartera):
+    while True:
+        opcion = questionary.select(
+            "¿Qué acción deseas realizar?",
+            choices=[
+                "Ver el resumen de tu cartera",
+                "Modificar fondos",
+                "Ver gráfico de evolución prevista",
+                "Guardar configuración",
+                "Cargar configuración",
+                "Salir"
+            ]
+        ).ask()
+
+        match opcion:
+            case "Ver el resumen de tu cartera":
+                print(cartera)
+            
+            case "Modificar fondos":
+                cartera.modificar()
+            
+            case "Ver gráfico de evolución prevista":
+                anyos_str = questionary.text("Introduce el número de años para la proyección:").ask()
+                if anyos_str.isdigit():
+                    graficar_continuo_por_fondo(cartera, tiempo=int(anyos_str))
+                else:
+                    print("Error: Debes introducir un número válido.")
+            
+            case "Guardar configuración":
+                guardar_cartera(cartera)
+                print("Configuración guardada con éxito.")
+            
+            case "Cargar configuración":
+                cartera = cargar_cartera()
+                print("Configuración cargada.")
+            
+            case "Salir":
+                confirmar = questionary.confirm("¿Estás seguro de que quieres salir?").ask()
+                if confirmar:
+                    break
+
+    return cartera
 
 if __name__ == "__main__":
     cartera = Cartera()
@@ -86,35 +130,5 @@ if __name__ == "__main__":
 ⠀⠈⠫⣎⡝⡢⢤⣀⠀⠀⣀⣀⡤⡾⠃⠀
 ⠀⠀⠀⠀⠉⠚⣔⣿⣤⣤⡽⠓⠉⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠘⠛⠛⠋⠀⠀⠀⠀⠀⠀
-Aun no estan disponibles la opcion 4 y 5.
 """)
-    while(True):
-        opcion = int(
-            input(
-                """
-Selecciona una opcion
-0 - Salir
-1 - ver el resumen de tu cartera
-2 - modificar fondos
-3 - ver un gráfico de la evolución prevista del patrimonio
-4 - Guardar configuracion
-5 - Cargar configuracion
-"""
-            )
-        )
-        match(opcion):
-            case 0:
-                break
-            case 1:
-                print(cartera)
-            case 2:
-                cartera.modificar()
-            case 3:
-                anyos = int(input("Introduce el número de años para la proyección: "))
-                graficar_continuo_por_fondo(cartera, tiempo=anyos)
-            case 4:
-                guardar_cartera(cartera)
-            case 5:
-                cartera = cargar_cartera()
-            case _:
-                print("opcion no valida")
+    ejecutar_menu(cartera)

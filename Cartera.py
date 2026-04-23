@@ -1,5 +1,6 @@
 from Fondo import Fondo
 import json
+import questionary
 class Cartera():
     def __init__(self,fondos=None):  
         self.fondos = fondos if fondos is not None else []
@@ -26,42 +27,60 @@ class Cartera():
         
         for fondo in self.fondos:
             fondo.resume()
-    def modificar(self):
-        opcion = int(input("""
-1- añadir fondo
-2- eliminar fondo
-3- editar fondo
-"""))
-        match(opcion):
-            case 1:
-                codigo = input("Introduce su código: ")
-                monto = float(input("Introduce una aportacion anual: "))
-                rentabilidad = float(input("Introduce la rentabilidad esperada: "))
-                riesgo = float(input("Introduce el riesgo: "))
-                self.fondos.append(Fondo(codigo,monto,rentabilidad,riesgo))
-            case 2:
-                codigo = input("Introduce su código: ")
-                fondo = next((f for f in self.fondos if f.codigo == codigo), None)
-                if fondo:
-                    self.fondos.remove(fondo)
-                else:
-                    print("No se encontró ningún fondo con ese código.")
-            case 3:
-                codigo = input("Introduce su código: ")
-                fondo = next((f for f in self.fondos if f.codigo == codigo), None)
-                
-                if not fondo:
-                    print("No se encontró ningún fondo con ese código.")
-                    return
 
-                monto = float(input("Introduce una aportacion anual: "))
-                interes = float(input("Introduce el interes previsto: "))
-                riesgo = float(input("Introduce el riesgo: "))
+
+    def modificar(self):
+        accion = questionary.select(
+            "Gestión de Fondos:",
+            choices=[
+                "Añadir fondo",
+                "Eliminar fondo",
+                "Editar fondo",
+                "Atrás"
+            ]
+        ).ask()
+
+        if accion == "Atrás":
+            return
+
+        if accion == "Añadir fondo":
+            codigo = questionary.text("Introduce su código:").ask()
+            monto = float(questionary.text("Aportación anual:", validate=lambda t: t.replace('.','',1).isdigit()).ask())
+            rentabilidad = float(questionary.text("Rentabilidad esperada:", validate=lambda t: t.replace('.','',1).isdigit()).ask())
+            riesgo = float(questionary.text("Riesgo:", validate=lambda t: t.replace('.','',1).isdigit()).ask())
+            
+            self.fondos.append(Fondo(codigo, monto, rentabilidad, riesgo))
+            print(f"Fondo {codigo} añadido.")
+
+        elif accion in ["Eliminar fondo", "Editar fondo"]:
+            if not self.fondos:
+                print("No hay fondos registrados.")
+                return
+
+            nombres_fondos = [f.codigo for f in self.fondos]
+            codigo_sel = questionary.select(
+                f"Selecciona el fondo para {accion.lower()}:",
+                choices=nombres_fondos
+            ).ask()
+
+            fondo = next(f for f in self.fondos if f.codigo == codigo_sel)
+
+            if accion == "Eliminar fondo":
+                confirmar = questionary.confirm(f"¿Seguro que quieres borrar {codigo_sel}?").ask()
+                if confirmar:
+                    self.fondos.remove(fondo)
+                    print(f"Fondo {codigo_sel} eliminado.")
+
+            elif accion == "Editar fondo":
+                monto = float(questionary.text("Nueva aportación anual:", default=str(fondo.monto)).ask())
+                interes = float(questionary.text("Nuevo interés previsto:", default=str(fondo.rentabilidad)).ask())
+                riesgo = float(questionary.text("Nuevo riesgo:", default=str(fondo.riesgo)).ask())
                 
                 fondo.monto = monto
-                fondo.riesgo = riesgo
                 fondo.rentabilidad = interes
-                print(f"Se actualizó el monto del fondo {codigo} a {monto}")
+                fondo.riesgo = riesgo
+                print(f"Fondo {codigo_sel} actualizado correctamente.")
+    
     def to_dict(self):
         return [fondo.to_dict() for fondo in self.fondos]
     
